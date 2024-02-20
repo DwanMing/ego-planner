@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <iostream>
 #include <nav_msgs/Path.h>
+#include <geometry_msgs/PointStamped.h>
 #include <sensor_msgs/Imu.h>
 #include <ros/ros.h>
 #include <std_msgs/Empty.h>
@@ -94,7 +95,7 @@ namespace ego_planner
     /* ROS functions */
     void execFSMCallback(const ros::TimerEvent &e);
     void checkCollisionCallback(const ros::TimerEvent &e);
-    void waypointCallback(const nav_msgs::PathConstPtr &msg);
+    void waypointCallback(const geometry_msgs::PointStamped::ConstPtr& goal);
     void odometryCallback(const nav_msgs::OdometryConstPtr &msg);
 
     bool checkCollision();

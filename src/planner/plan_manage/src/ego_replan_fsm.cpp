@@ -42,7 +42,7 @@ namespace ego_planner
     data_disp_pub_ = nh.advertise<ego_planner::DataDisp>("/planning/data_display", 100);
 
     if (target_type_ == TARGET_TYPE::MANUAL_TARGET)
-      waypoint_sub_ = nh.subscribe("/waypoint_generator/waypoints", 1, &EGOReplanFSM::waypointCallback, this);
+      waypoint_sub_ = nh.subscribe("/way_point", 1, &EGOReplanFSM::waypointCallback, this);
     else if (target_type_ == TARGET_TYPE::PRESET_TARGET)
     {
       ros::Duration(1.0).sleep();
@@ -105,18 +105,20 @@ namespace ego_planner
       ROS_ERROR("Unable to generate global trajectory!");
     }
   }
-
-  void EGOReplanFSM::waypointCallback(const nav_msgs::PathConstPtr &msg)
+// geometry_msgs::PointStamped
+  void EGOReplanFSM::waypointCallback(const geometry_msgs::PointStamped::ConstPtr& msg)
   {
-    if (msg->poses[0].pose.position.z < -0.1)
+    if (msg->point.z < -0.1)
       return;
+
+    // goal->point.x
 
     cout << "Triggered!" << endl;
     trigger_ = true;
     init_pt_ = odom_pos_;
 
     bool success = false;
-    end_pt_ << msg->poses[0].pose.position.x, msg->poses[0].pose.position.y, 1.0;
+    end_pt_ << msg->point.x, msg->point.y, 1.0;
     success = planner_manager_->planGlobalTraj(odom_pos_, odom_vel_, Eigen::Vector3d::Zero(), end_pt_, Eigen::Vector3d::Zero(), Eigen::Vector3d::Zero());
 
     visualization_->displayGoalPoint(end_pt_, Eigen::Vector4d(0, 0.5, 0.5, 1), 0.3, 0);
